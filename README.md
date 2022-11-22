@@ -1,12 +1,19 @@
 # mangaworld_downloader
 A manga pdf downloader from mangaworld
+
 Un programma per scaricare manga da mangaworld(sito italiano)
 
 --------------------------------------
 # Setup
 ## Install Python and dipendencies
-    sudo pacman -S python python-pip
-    sudo apt install python3 python3-pip
+- Arch-based:
+
+      sudo pacman -S python python-pip
+
+- Debian/Ubuntu:
+
+      sudo apt install python3 python3-pip
+
 
 ## Install dependencies of Python
     pip install -r requirements.txt
