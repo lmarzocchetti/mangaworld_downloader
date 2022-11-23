@@ -27,5 +27,7 @@ Un programma per scaricare manga da mangaworld(sito italiano)
 
 # To implement
 - Progress Bar
-- Windows support(?) -> Probably this script can work on windows, but i didn't test it
 - Gui
+
+# Windows User
+I haven't tested this script on Windows, but i have used the os independent paths. So i think its gonna work.
