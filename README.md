@@ -26,7 +26,6 @@ Un programma per scaricare manga da mangaworld(sito italiano)
 - After the program finished, you will find in the same directory all the pdf separated in Volumes
 
 # To implement
-- Progress Bar
 - Gui
 
 # Windows User

@@ -4,7 +4,6 @@ import bs4
 import os
 import subprocess
 import shutil
-import pathlib
 import threading
 from PIL import Image
 import img2pdf
@@ -12,6 +11,29 @@ import img2pdf
 RESEARCH_STRING = "https://www.mangaworld.so/archive?keyword="
 
 CHAPTERS_STRING = "?style=pages"
+
+
+def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='#', printEnd="\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 *
+                                                     (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + ' ' * (length - filledLength)
+    print(f'\r{prefix} [{bar}] {percent}% {suffix}', end=printEnd)
+    # Print New Line on Complete
+    if iteration == total:
+        print()
 
 
 def research_manga(manga: str) -> dict[str, str]:
@@ -30,7 +52,8 @@ def research_manga(manga: str) -> dict[str, str]:
     results = soup.find("body")
     job_all = results.find_all("a", class_="thumb position-relative")
 
-    manga_dict = {job.__str__().split(r'"')[5]: job.__str__().split(r'"')[3] for job in job_all}
+    manga_dict = {job.__str__().split(r'"')[5]: job.__str__().split(r'"')[
+        3] for job in job_all}
 
     return manga_dict
 
@@ -163,6 +186,9 @@ def download_chapter_images(chapter_url: str, vol_index: str, chap_index: str, s
 def download_volumes_images(vol_chap_dict: dict[str, list[str]], selected_manga: str) -> dict[int, dict[int, int]]:
     vol_chap_num_images_dict: dict[int, dict[int, int]] = {}
 
+    total_chapter: int = sum([len(chaps) for chaps in vol_chap_dict.values()])
+    current_chapter: int = 0
+
     for index_vol, vol_name in enumerate(vol_chap_dict.keys()):
         chap_num_pages_dict: dict[int, int] = {}
 
@@ -170,8 +196,12 @@ def download_volumes_images(vol_chap_dict: dict[str, list[str]], selected_manga:
             url: str = chap_link + "/" + str(1) + CHAPTERS_STRING
             number_of_images = number_of_images_in_chapter(url)
             chap_num_pages_dict[index_chap] = number_of_images
-            download_chapter_images(chap_link, str(index_vol), str(index_chap), selected_manga, number_of_images)
-        
+            download_chapter_images(chap_link, str(index_vol), str(
+                index_chap), selected_manga, number_of_images)
+            current_chapter += 1
+            printProgressBar(current_chapter, total_chapter,
+                             prefix="Chapter download:", length=50)
+
         vol_chap_num_images_dict[index_vol] = chap_num_pages_dict
 
     return vol_chap_num_images_dict
@@ -203,15 +233,16 @@ def remove_data_folder() -> None:
     """Remove recursively all data in the Data folder
     """
     shutil.rmtree("Data")
-    
+
+
 def create_pdf(vol_chap_num_pages: dict[int, dict[int, int]], selected_manga: str) -> None:
     for vol_num, chap_num_pag_dict in vol_chap_num_pages.items():
         images = []
 
         for chap_num, num_pages in chap_num_pag_dict.items():
             for i in range(1, int(num_pages) + 1):
-                images.append(Image.open(os.path.join("Data",selected_manga, str(vol_num), f"{chap_num}_{i}.jpg")))
-
+                images.append(Image.open(os.path.join(
+                    "Data", selected_manga, str(vol_num), f"{chap_num}_{i}.jpg")))
 
         images_filename = [image.filename for image in images]
 
@@ -223,8 +254,9 @@ def create_pdf(vol_chap_num_pages: dict[int, dict[int, int]], selected_manga: st
 
         for image in images:
             image.close()
-        
+
         file.close()
+
 
 def main():
     if len(sys.argv) != 2:
@@ -246,7 +278,8 @@ def main():
 
     create_data_volumes_folders(selected_manga, vol_chap_dict)
 
-    volume_chap_num_pages_dict: dict[int, dict[int, int]] = download_volumes_images(vol_chap_dict, selected_manga)
+    volume_chap_num_pages_dict: dict[int, dict[int, int]] = download_volumes_images(
+        vol_chap_dict, selected_manga)
 
     create_pdf(volume_chap_num_pages_dict, selected_manga)
 
