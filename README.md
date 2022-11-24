@@ -22,7 +22,7 @@ Un programma per scaricare manga da mangaworld(sito italiano)
     python3 mangaworld_downloader.py [name_of_manga]
 
 - Call the script with the manga to research, follow the instruction on the screen and select a manga to download.
-- Once selected the manga and press enter, wait the program to finish, don't worry (i have not implemented a bar yet).
+- Once selected the manga and press enter, wait the program to finish.
 - After the program finished, you will find in the same directory all the pdf separated in Volumes
 
 # To implement
