@@ -59,6 +59,14 @@ def research_manga(manga: str) -> dict[str, str]:
 
 
 def manga_with_volumes_links(job_all: bs4.element.ResultSet) -> dict[str, list[str]]:
+    """Return a dictionary with number of volumes and all the links for their chapters, for mangas that have volumes division
+
+    Args:
+        job_all (bs4.element.ResultSet): Each element of the volume to parse
+
+    Returns:
+        dict[str, list[str]]: dictionary with keys: volume_number and values:list to their chapter links
+    """
     vol_chap_dict = {}
 
     for num_vol, vol in enumerate(job_all):
@@ -76,6 +84,14 @@ def manga_with_volumes_links(job_all: bs4.element.ResultSet) -> dict[str, list[s
 
 
 def manga_with_chapters_links(job_all: bs4.element.ResultSet) -> dict[str, list[str]]:
+    """Return a dictionary with 1 volume and all the links for it chapters, for mangas that doesn't have volumes but only chapters
+
+    Args:
+        job_all (bs4.element.ResultSet): Each element of the volume to parse (aka all chapters in this case)
+
+    Returns:
+        dict[str, list[str]]: dictionary with keys: dictionary with 1 key (Volume0) and a links to it chapters
+    """
     vol_chap_dict = {}
     vol_chap_dict["Volume0"] = []
 
@@ -143,6 +159,14 @@ def choose_manga(manga_dict: dict[str, str]) -> str:
 
 
 def number_of_images_in_chapter(chapter_url: str) -> int:
+    """Return the number of images in the chapter linked by the chapter url
+
+    Args:
+        chapter_url (str): A chapter url
+
+    Returns:
+        int: Number of images in chapters
+    """
     page = page = requests.get(chapter_url)
     soup = bs4.BeautifulSoup(page.content, "html.parser")
     results = soup.find("body")
@@ -155,6 +179,15 @@ def number_of_images_in_chapter(chapter_url: str) -> int:
 
 
 def download_image(image_url: str, vol_index: str, chap_index: str, image_index: str, selected_manga: str) -> None:
+    """Download an image and save it to a folder (Data/{selected_manga}/{vol_index}/{chap_index}_{image_index}.jpg)
+
+    Args:
+        image_url (str): url to download the image
+        vol_index (str): volume associated with that image
+        chap_index (str): chapter index in this volume
+        image_index (str): positional number of this image a specific chapter
+        selected_manga (str): manga selected
+    """
     page = requests.get(image_url)
     soup = bs4.BeautifulSoup(page.content, "html.parser")
     results = soup.find("body")
@@ -169,6 +202,15 @@ def download_image(image_url: str, vol_index: str, chap_index: str, image_index:
 
 
 def download_chapter_images(chapter_url: str, vol_index: str, chap_index: str, selected_manga: str, number_of_images: int) -> None:
+    """Download all images contained in a chapter and save it (see download_image function)
+
+    Args:
+        chapter_url (str): url associated with a chapter
+        vol_index (str): volume number associated with this chapter
+        chap_index (str): chapter index in this volume
+        selected_manga (str): manga selected
+        number_of_images (int): number of images contained this chapter
+    """
     threads = []
 
     for i in range(1, int(number_of_images) + 1):
@@ -184,6 +226,15 @@ def download_chapter_images(chapter_url: str, vol_index: str, chap_index: str, s
 
 
 def download_volumes_images(vol_chap_dict: dict[str, list[str]], selected_manga: str) -> dict[int, dict[int, int]]:
+    """Download all images in every volume of a specific manga
+
+    Args:
+        vol_chap_dict (dict[str, list[str]]): dictionary in which the keys are the volumes and values are the links to their chapters
+        selected_manga (str): manga selected
+
+    Returns:
+        dict[int, dict[int, int]]: dictionary of dictionary, with key=volume and the value is dictionary with key=chapter and value=number of images in the chapter
+    """
     vol_chap_num_images_dict: dict[int, dict[int, int]] = {}
 
     total_chapter: int = sum([len(chaps) for chaps in vol_chap_dict.values()])
@@ -236,6 +287,12 @@ def remove_data_folder() -> None:
 
 
 def create_pdf(vol_chap_num_pages: dict[int, dict[int, int]], selected_manga: str) -> None:
+    """Create pdfs of every volume contained in the selected manga
+
+    Args:
+        vol_chap_num_pages (dict[int, dict[int, int]]): see @download_volumes_images function
+        selected_manga (str): manga selected
+    """
     for vol_num, chap_num_pag_dict in vol_chap_num_pages.items():
         images = []
 
