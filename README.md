@@ -5,7 +5,7 @@ Un programma per scaricare manga da mangaworld(sito italiano)
 
 --------------------------------------
 # Setup
-## Install Python and dipendencies
+## Install Python and dependencies
 - Arch-based:
 
       sudo pacman -S python python-pip
@@ -19,7 +19,7 @@ Un programma per scaricare manga da mangaworld(sito italiano)
     pip install -r requirements.txt
 
 # Usage
-    python3 mangaworld_downloader.py [name_of_manga]
+    python mangaworld_downloader.py [name_of_manga]
 
 - Call the script with the manga to research, follow the instruction on the screen and select a manga to download.
 - Once selected the manga and press enter, wait the program to finish.
