@@ -6,7 +6,8 @@ import subprocess
 import shutil
 import threading
 from PIL import Image
-import img2pdf
+from PyPDF2 import PdfMerger
+import io
 
 RESEARCH_STRING = "https://www.mangaworld.so/archive?keyword="
 
@@ -294,25 +295,26 @@ def create_pdf(vol_chap_num_pages: dict[int, dict[int, int]], selected_manga: st
         selected_manga (str): manga selected
     """
     for vol_num, chap_num_pag_dict in vol_chap_num_pages.items():
-        images = []
+        merger = PdfMerger()
 
         for chap_num, num_pages in chap_num_pag_dict.items():
             for i in range(1, int(num_pages) + 1):
-                images.append(Image.open(os.path.join(
-                    "Data", selected_manga, str(vol_num), f"{chap_num}_{i}.jpg")))
+                image_path = os.path.join("Data", selected_manga, str(vol_num), f"{chap_num}_{i}.jpg")
+                image = Image.open(image_path)
+                
+                # Convert image to PDF
+                pdf_bytes = io.BytesIO()
+                image.save(pdf_bytes, format='PDF')
+                pdf_bytes.seek(0)
+                
+                # Add PDF page to merger
+                merger.append(pdf_bytes)
 
-        images_filename = [image.filename for image in images]
+        # Save the merged PDF
+        with open(f"Volume_{vol_num}.pdf", "wb") as output_file:
+            merger.write(output_file)
 
-        pdf_bytes = img2pdf.convert(images_filename)
-
-        file = open(f"Volume_{vol_num}.pdf", "wb")
-
-        file.write(pdf_bytes)
-
-        for image in images:
-            image.close()
-
-        file.close()
+        merger.close()
 
 
 def main():
