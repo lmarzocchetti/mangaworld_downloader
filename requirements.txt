@@ -1,4 +1,4 @@
 requests
-img2pdf
+PyPDF2
 Pillow
 beautifulsoup4
