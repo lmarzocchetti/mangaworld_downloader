@@ -134,7 +134,9 @@ def print_manga(manga_dict: dict[str, str]):
     Args:
         manga_dict (dict[str, str]): Mangas researched
     """
-    _ = subprocess.call('clear' if os.name == 'posix' else 'cls')
+    # _ = subprocess.call('clear' if os.name == 'posix' else 'cls')
+
+    os.system('cls' if os.name == 'nt' else 'clear')
 
     for index, manga in enumerate(manga_dict.keys()):
         print(f"{index}-{manga}")
